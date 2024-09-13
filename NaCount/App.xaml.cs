@@ -1,4 +1,4 @@
-﻿namespace CountIt
+﻿namespace NaCount
 {
     public partial class App : Application
     {

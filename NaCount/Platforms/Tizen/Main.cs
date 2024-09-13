@@ -2,7 +2,7 @@ using Microsoft.Maui;
 using Microsoft.Maui.Hosting;
 using System;
 
-namespace CountIt
+namespace NaCount
 {
     internal class Program : MauiApplication
     {

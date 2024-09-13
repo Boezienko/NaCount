@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
-    x:Class="CountIt.AppShell"
+    x:Class="NaCount.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:CountIt"
+    xmlns:local="clr-namespace:NaCount"
     Shell.FlyoutBehavior="Disabled"
-    Title="CountIt">
+    Title="NaCount">
 
     <ShellContent
         Title="Home"

@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace CountIt
+namespace NaCount
 {
     [Application]
     public class MainApplication : MauiApplication

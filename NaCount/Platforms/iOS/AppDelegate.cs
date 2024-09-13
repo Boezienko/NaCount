@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace CountIt
+namespace NaCount
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate

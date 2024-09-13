@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace CountIt
+namespace NaCount
 {
     public class Program
     {
