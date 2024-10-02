@@ -73,6 +73,8 @@
             // Find contours
             using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
             {
+                CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+
                 // Filter contours by size
                 int minContourArea = 50; // Adjust this value based on your needs
                 int shapeCount = 0;
