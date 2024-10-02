@@ -4,6 +4,7 @@
     using Emgu.CV.Structure;
     using Emgu.CV.CvEnum;
     using Emgu.CV.Util;
+    using System.Text;
 
     public partial class MainPage : ContentPage
     {
@@ -62,22 +63,33 @@
             Mat gray = new Mat();
             CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
 
+            // Apply Gausian blur
+            CvInvoke.GaussianBlur(gray, gray, new System.Drawing.Size(3, 3), 1.0);
+
             // Apply Canny edge detection
             Mat cannyEdges = new Mat();
-            CvInvoke.Canny(gray, cannyEdges, 100, 200);
+            CvInvoke.Canny(gray, cannyEdges, 75, 200);
 
             // Find contours
             using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
             {
-                CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-                int shapeCount = contours.Size;
+                // Filter contours by size
+                int minContourArea = 50; // Adjust this value based on your needs
+                int shapeCount = 0;
+                for (int i = 0; i < contours.Size; i++)
+                {
+                    if (CvInvoke.ContourArea(contours[i]) > minContourArea)
+                    {
+                        shapeCount++;
+                    }
+                }
 
                 // Display the number of shapes detected
                 await DisplayAlert("Shapes Detected", $"Number of shapes detected: {shapeCount}", "OK");
             }
         }
 
-
+       
 
 
 
