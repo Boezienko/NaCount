@@ -37,26 +37,8 @@
                             }
                         }
 
-                        // Load the image into Emgu CV Mat
-                        Mat img = CvInvoke.Imread(filePath, ImreadModes.Color);
+                        AnalyzePhoto(filePath);
 
-                        // Convert to grayscale
-                        Mat gray = new Mat();
-                        CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
-
-                        // Apply Canny edge detection
-                        Mat cannyEdges = new Mat();
-                        CvInvoke.Canny(gray, cannyEdges, 100, 200);
-
-                        // Find contours
-                        using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
-                        {
-                            CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-                            int shapeCount = contours.Size;
-
-                            // Display the number of shapes detected
-                            await DisplayAlert("Shapes Detected", $"Number of shapes detected: {shapeCount}", "OK");
-                        }
                     }
                 }
                 catch (Exception ex)
@@ -69,6 +51,35 @@
                 await DisplayAlert("Unsupported", "Camera capture is not supported on this device.", "OK");
             }
         }
+
+
+        private async void AnalyzePhoto(String filepath)
+        {
+            // Load the image into Emgu CV Mat
+            Mat img = CvInvoke.Imread(filepath, ImreadModes.Color);
+
+            // Convert to grayscale
+            Mat gray = new Mat();
+            CvInvoke.CvtColor(img, gray, ColorConversion.Bgr2Gray);
+
+            // Apply Canny edge detection
+            Mat cannyEdges = new Mat();
+            CvInvoke.Canny(gray, cannyEdges, 100, 200);
+
+            // Find contours
+            using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
+            {
+                CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+                int shapeCount = contours.Size;
+
+                // Display the number of shapes detected
+                await DisplayAlert("Shapes Detected", $"Number of shapes detected: {shapeCount}", "OK");
+            }
+        }
+
+
+
+
 
     }
 
