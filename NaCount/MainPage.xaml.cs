@@ -38,7 +38,7 @@
                             }
                         }
 
-                        //AnalyzePhoto(filePath);
+                        AnalyzePhoto(filePath);
 
                     }
                 }

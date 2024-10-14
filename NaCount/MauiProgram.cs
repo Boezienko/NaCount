@@ -1,4 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using Microsoft.ML;
+//using NaCount.YoloParser;
+//using NaCount.DataStructures;
+using NaCount;
+
 
 namespace NaCount
 {
@@ -21,6 +28,18 @@ namespace NaCount
 
             return builder.Build();
         }
+
+        /*
+        static string GetAbsolutePath(string relativePath)
+        {
+            FileInfo _dataRoot = new FileInfo(typeof(Program).Assembly.Location);
+            string assemblyFolderPath = _dataRoot.Directory.FullName;
+
+            string fullPath = Path.Combine(assemblyFolderPath, relativePath);
+
+            return fullPath;
+        }
+        */
     }
 
 
