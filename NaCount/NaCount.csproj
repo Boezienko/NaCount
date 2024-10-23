@@ -96,4 +96,8 @@
 	  </None>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="assets\images\output\" />
+	</ItemGroup>
+
 </Project>
