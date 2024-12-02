@@ -76,24 +76,34 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="assets\images\image1.jpg">
+	  <None Update="Resources\Raw\assets\images\image1.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="assets\images\image2.jpg">
+	  <None Update="Resources\Raw\assets\images\image2.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="assets\images\image3.jpg">
+	  <None Update="Resources\Raw\assets\images\image3.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="assets\images\image4.jpg">
+	  <None Update="Resources\Raw\assets\images\image4.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="assets\images\wikimedia.md">
+	  <None Update="Resources\Raw\assets\images\wikimedia.md">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="assets\Model\TinyYolo2_model.onnx">
+	  <None Update="Resources\Raw\assets\Model\TinyYolo2_model.onnx">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\Raw\assets\images\input\" />
+	  <Folder Include="Resources\Raw\assets\images\output\" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<MauiAsset Include="Resources\Raw\assets\Model\TinyYolo2_model.onnx" LogicalName="TinyYolo2_model.onnx" />
+	</ItemGroup>
+
 
 </Project>

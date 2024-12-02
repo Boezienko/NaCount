@@ -9,11 +9,22 @@ namespace NaCount.DataStructures
 {
     public class ImageNetData
     {
+
+
         [LoadColumn(0)]
         public string ImagePath;
 
         [LoadColumn(1)]
         public string Label;
+
+        // Parameterless constructor for use with ReadFromFile
+        public ImageNetData() { }
+        public ImageNetData(string imagePath)
+        {
+            ImagePath = imagePath;
+            Label = Path.GetFileName(imagePath); // Use the filename as the label if needed
+        }
+
 
         public static IEnumerable<ImageNetData> ReadFromFile(string imageFolder)
         {

@@ -5,14 +5,46 @@
     using Emgu.CV.CvEnum;
     using Emgu.CV.Util;
     using System.Text;
+    using NaCount.DataStructures;
+    using Microsoft.ML;
+    using ObjectDetection;
+    using NaCount.YoloParser;
+    using System.Drawing.Drawing2D;
+    using System.Drawing;
+    using ObjectDetection.YoloParser;
+
 
     public partial class MainPage : ContentPage
     {
-        int count = 0;
+        private MLContext mlContext;
+        private OnnxModelScorer modelScorer;
+        private YoloOutputParser parser;
 
         public MainPage()
         {
             InitializeComponent();
+
+            // Initialize ML context and components here
+            mlContext = new MLContext();
+            
+
+            var assetsRelativePath = FileSystem.AppDataDirectory;
+            //string assetsPath = GetAbsolutePath(assetsRelativePath);
+            var modelFilePath = Path.Combine(FileSystem.AppDataDirectory, "Resources", "Raw", "assets", "Model", "TinyYolo2_model.onnx");
+            var pathToImage = Path.Combine(FileSystem.AppDataDirectory, "Resources", "Raw", "assets", "images", "input");
+
+            modelScorer = new OnnxModelScorer(pathToImage, modelFilePath, mlContext);
+            parser = new YoloOutputParser();
+        }
+
+        static string GetAbsolutePath(string relativePath)
+        {
+            FileInfo _dataRoot = new FileInfo(typeof(MauiProgram).Assembly.Location);
+            string assemblyFolderPath = _dataRoot.Directory.FullName;
+
+            string fullPath = Path.Combine(assemblyFolderPath, relativePath);
+
+            return fullPath;
         }
 
         private async void OnCounterClicked(object sender, EventArgs e)
@@ -24,22 +56,18 @@
                     var photo = await MediaPicker.Default.CapturePhotoAsync();
                     if (photo != null)
                     {
-                        // Define the path to save the image in the Resources/Images directory
-                        var resourceDir = Path.Combine(FileSystem.AppDataDirectory, "Resources", "Images");
-                        Directory.CreateDirectory(resourceDir); // Ensure the directory exists
+                        var resourceDir = Path.Combine("NaCount", "Resources", "Raw", "assets", "images", "input");
+                        Directory.CreateDirectory(resourceDir);
                         var filePath = Path.Combine(resourceDir, photo.FileName);
 
-                        // Save the photo to the specified directory
                         using (var stream = await photo.OpenReadAsync())
+                        using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                         {
-                            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
-                            {
-                                await stream.CopyToAsync(fileStream);
-                            }
+                            await stream.CopyToAsync(fileStream);
                         }
 
-                        AnalyzePhoto(filePath);
-
+                        // Analyze the photo using the ONNX model
+                        DetectObjects(filePath);
                     }
                 }
                 catch (Exception ex)
@@ -53,6 +81,79 @@
             }
         }
 
+        void DetectObjects(string filePath)
+        {
+            string pathToImage = "assets/Model/input";
+            string pathToOutput = "assets/Model/output";
+
+            // Load the captured image into ImageNetData
+            var images = new List<ImageNetData> { new ImageNetData(filePath) };
+            var imageDataView = mlContext.Data.LoadFromEnumerable(images);
+            var probabilities = modelScorer.Score(imageDataView);
+            var boundingBoxes = probabilities
+                .Select(probability => parser.ParseOutputs(probability))
+                .Select(boxes => parser.FilterBoundingBoxes(boxes, 5, .5F));
+
+            // Draw bounding boxes and display results
+            DrawBoundingBox(pathToImage, pathToOutput, Path.GetFileName(filePath), boundingBoxes.First());
+        }
+
+        void DrawBoundingBox(string inputImageLocation, string outputImageLocation, string imageName, IList<YoloBoundingBox> filteredBoundingBoxes)
+        {
+            Image image = Image.FromFile(Path.Combine(inputImageLocation, imageName));
+
+            var originalImageHeight = image.Height;
+            var originalImageWidth = image.Width;
+
+            foreach (var box in filteredBoundingBoxes)
+            {
+                // Get Bounding Box Dimensions
+                var x = (uint)Math.Max(box.Dimensions.X, 0);
+                var y = (uint)Math.Max(box.Dimensions.Y, 0);
+                var width = (uint)Math.Min(originalImageWidth - x, box.Dimensions.Width);
+                var height = (uint)Math.Min(originalImageHeight - y, box.Dimensions.Height);
+
+                // Resize To Image
+                x = (uint)originalImageWidth * x / OnnxModelScorer.ImageNetSettings.imageWidth;
+                y = (uint)originalImageHeight * y / OnnxModelScorer.ImageNetSettings.imageHeight;
+                width = (uint)originalImageWidth * width / OnnxModelScorer.ImageNetSettings.imageWidth;
+                height = (uint)originalImageHeight * height / OnnxModelScorer.ImageNetSettings.imageHeight;
+
+                // Bounding Box Text
+                string text = $"{box.Label} ({(box.Confidence * 100).ToString("0")}%)";
+
+                using (Graphics thumbnailGraphic = Graphics.FromImage(image))
+                {
+                    thumbnailGraphic.CompositingQuality = CompositingQuality.HighQuality;
+                    thumbnailGraphic.SmoothingMode = SmoothingMode.HighQuality;
+                    thumbnailGraphic.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+                    // Define Text Options
+                    Font drawFont = new Font("Arial", 12, FontStyle.Bold);
+                    SizeF size = thumbnailGraphic.MeasureString(text, drawFont);
+                    SolidBrush fontBrush = new SolidBrush(Color.Black);
+                    Point atPoint = new Point((int)x, (int)y - (int)size.Height - 1);
+
+                    // Define BoundingBox options
+                    Pen pen = new Pen(box.BoxColor, 3.2f);
+                    SolidBrush colorBrush = new SolidBrush(box.BoxColor);
+
+                    // Draw text on image 
+                    thumbnailGraphic.FillRectangle(colorBrush, (int)x, (int)(y - size.Height - 1), (int)size.Width, (int)size.Height);
+                    thumbnailGraphic.DrawString(text, drawFont, fontBrush, atPoint);
+
+                    // Draw bounding box on image
+                    thumbnailGraphic.DrawRectangle(pen, x, y, width, height);
+                }
+            }
+
+            if (!Directory.Exists(outputImageLocation))
+            {
+                Directory.CreateDirectory(outputImageLocation);
+            }
+
+            image.Save(Path.Combine(outputImageLocation, imageName));
+        }
 
         private async void AnalyzePhoto(String filepath)
         {
@@ -90,13 +191,5 @@
                 await DisplayAlert("Shapes Detected", $"Number of shapes detected: {shapeCount}", "OK");
             }
         }
-
-       
-
-
-
     }
-
-
-
 }
