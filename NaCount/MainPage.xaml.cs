@@ -22,6 +22,8 @@
 
         public MainPage()
         {
+            Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
             InitializeComponent();
 
             // Initialize ML context and components here
@@ -56,8 +58,8 @@
                     var photo = await MediaPicker.Default.CapturePhotoAsync();
                     if (photo != null)
                     {
-                        var resourceDir = Path.Combine("NaCount", "Resources", "Raw", "assets", "images", "input");
-                        Directory.CreateDirectory(resourceDir);
+                        var resourceDir = Path.Combine(FileSystem.AppDataDirectory, "Resources", "Raw", "assets", "images", "input");
+                        //Directory.CreateDirectory(resourceDir);
                         var filePath = Path.Combine(resourceDir, photo.FileName);
 
                         using (var stream = await photo.OpenReadAsync())
@@ -155,6 +157,7 @@
             image.Save(Path.Combine(outputImageLocation, imageName));
         }
 
+        /*
         private async void AnalyzePhoto(String filepath)
         {
             // Load the image into Emgu CV Mat
@@ -191,5 +194,6 @@
                 await DisplayAlert("Shapes Detected", $"Number of shapes detected: {shapeCount}", "OK");
             }
         }
+        */
     }
 }

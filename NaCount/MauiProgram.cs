@@ -36,12 +36,21 @@
 
         public static void Main(string[] args)
         {
+            Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
             var assetsRelativePath = FileSystem.AppDataDirectory;
             string assetsPath = GetAbsolutePath(assetsRelativePath);
             var modelFilePath = GetModelFilePath("TinyYolo2_model.onnx");
                 
             var imagesFolder = Path.Combine(FileSystem.AppDataDirectory, "Resources", "Raw", "assets", "images", "input");
             var outputFolder = Path.Combine(FileSystem.AppDataDirectory, "Resources", "Raw", "assets", "images", "output");
+
+            var imagesFolderInfo = new DirectoryInfo(imagesFolder);
+            var outputFolderInfo = new DirectoryInfo(outputFolder);
+            Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+            Console.WriteLine($"Is Images Folder Writable: {imagesFolderInfo.Exists && IsDirectoryWritable(imagesFolderInfo)}");
+            Console.WriteLine($"Is Output Folder Writable: {outputFolderInfo.Exists && IsDirectoryWritable(outputFolderInfo)}");
+            Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
 
             // Initialize MLContext
@@ -86,6 +95,22 @@
             Console.WriteLine("========= End of Process..Hit any Key ========");
         }
 
+        static bool IsDirectoryWritable(DirectoryInfo directoryInfo)
+        {
+            try
+            {
+                // Attempt to create a temporary file in the directory
+                string testFilePath = Path.Combine(directoryInfo.FullName, Path.GetRandomFileName());
+                using (FileStream fs = File.Create(testFilePath, 1, FileOptions.DeleteOnClose))
+                {
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         static string GetAbsolutePath(string relativePath)
         {
             FileInfo _dataRoot = new FileInfo(typeof(MauiProgram).Assembly.Location);
